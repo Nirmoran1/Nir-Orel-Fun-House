@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏠 Fun House</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --nir: #a78bfa;
+    --orel: #34d399;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 28px 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+  .live-badge {
+    display: flex; align-items: center; gap: 5px;
+    background: rgba(63,185,80,0.1); border: 1px solid rgba(63,185,80,0.3);
+    color: var(--green); font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 20px; letter-spacing: 0.8px; text-transform: uppercase;
+  }
+  .live-dot {
+    width: 6px; height: 6px; background: var(--green);
+    border-radius: 50%; animation: blink 2s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  .header-right { display: flex; align-items: center; gap: 14px; }
+  .sync-info { font-size: 12px; color: var(--muted); }
+  .refresh-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--muted); padding: 5px 12px; border-radius: 6px;
+    cursor: pointer; font-size: 12px; font-family: inherit; transition: all 0.15s;
+  }
+  .refresh-btn:hover { color: var(--text); border-color: var(--muted); }
+
+  /* ── Error banner ── */
+  .error {
+    background: rgba(248,81,73,0.1); border: 1px solid rgba(248,81,73,0.3);
+    color: var(--red); padding: 10px 16px; border-radius: 8px;
+    font-size: 13px; margin-bottom: 20px; display: none;
+  }
+
+  /* ── Status cards ── */
+  .status-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin-bottom: 20px;
+  }
+  .person-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; position: relative; overflow: hidden;
+  }
+  .person-card.nir  { border-top: 3px solid var(--nir);  }
+  .person-card.orel { border-top: 3px solid var(--orel); }
+  .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .person-name { font-size: 15px; font-weight: 600; }
+  .agent-tag {
+    font-size: 11px; font-weight: 500; padding: 2px 9px;
+    border-radius: 20px; font-family: 'JetBrains Mono', monospace;
+  }
+  .nir  .agent-tag { background: rgba(167,139,250,0.15); color: var(--nir);  }
+  .orel .agent-tag { background: rgba(52,211,153,0.15);  color: var(--orel); }
+  .meta-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+  .meta-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; width: 62px; flex-shrink: 0; }
+  .meta-val { font-size: 13px; font-weight: 500; }
+  .working-box {
+    background: var(--surface2); border-radius: 7px;
+    padding: 9px 12px; margin-top: 12px; font-size: 13px; min-height: 38px;
+  }
+  .working-box .label { color: var(--muted); font-size: 11px; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .working-box .val { color: var(--text); }
+
+  /* ── Bottom panels ── */
+  .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .panel-head {
+    padding: 13px 18px; border-bottom: 1px solid var(--border);
+    font-size: 12px; font-weight: 600; color: var(--muted);
+    display: flex; align-items: center; gap: 7px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .panel-body { padding: 10px; }
+
+  /* ── Commits ── */
+  .commit { display: flex; gap: 10px; padding: 8px; border-radius: 6px; }
+  .commit:hover { background: var(--surface2); }
+  .c-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); margin-top: 4px; flex-shrink: 0; }
+  .c-dot.nir  { background: var(--nir);  }
+  .c-dot.orel { background: var(--orel); }
+  .c-msg { font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--text); margin-bottom: 2px; }
+  .c-meta { font-size: 11px; color: var(--muted); }
+
+  /* ── Notes ── */
+  .note {
+    padding: 8px 10px; border-left: 2px solid var(--border);
+    margin-bottom: 6px; font-size: 13px; color: var(--muted); border-radius: 0 4px 4px 0;
+  }
+
+  /* ── Empty / skeleton ── */
+  .empty { text-align: center; padding: 28px; color: var(--muted); font-size: 13px; }
+  .sk {
+    background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%);
+    background-size: 200% 100%; animation: shimmer 1.4s infinite;
+    border-radius: 4px; height: 13px; margin: 8px 0;
+  }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>🏠 Fun House</h1>
+    <div class="live-badge"><div class="live-dot"></div> Live</div>
+  </div>
+  <div class="header-right">
+    <div class="sync-info">
+      Refresh in <span id="cd">60</span>s &nbsp;·&nbsp; <span id="synced">—</span>
+    </div>
+    <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
+  </div>
+</div>
+
+<div class="error" id="err"></div>
+
+<div class="status-grid" id="status-grid">
+  <div class="person-card nir"><div class="sk"></div><div class="sk" style="width:55%"></div></div>
+  <div class="person-card orel"><div class="sk"></div><div class="sk" style="width:55%"></div></div>
+</div>
+
+<div class="bottom-grid">
+  <div class="panel">
+    <div class="panel-head">⚡ Recent Commits</div>
+    <div class="panel-body" id="commits"><div class="sk"></div><div class="sk"></div><div class="sk" style="width:70%"></div></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head">📝 Notes</div>
+    <div class="panel-body" id="notes"><div class="sk"></div><div class="sk" style="width:65%"></div></div>
+  </div>
+</div>
+
+<script>
+const REPO = 'Nirmoran1/Nir-Orel-Fun-House';
+let cdVal = 60, cdTimer;
+
+// ── API ─────────────────────────────────────────────────────────
+async function gh(path) {
+  const r = await fetch('https://api.github.com' + path, {
+    headers: { Accept: 'application/vnd.github.v3+json' }
+  });
+  if (!r.ok) throw new Error(`GitHub ${r.status} on ${path}`);
+  return r.json();
+}
+
+async function getWorkspace() {
+  const d = await gh(`/repos/${REPO}/contents/WORKSPACE.md`);
+  return atob(d.content.replace(/\n/g, ''));
+}
+
+async function getCommits() {
+  return gh(`/repos/${REPO}/commits?per_page=8`);
+}
+
+// ── Parse ────────────────────────────────────────────────────────
+function parseTable(md) {
+  const lines = md.split('\n');
+  const ti = lines.findIndex(l => l.includes('| Person'));
+  if (ti < 0) return [];
+  const rows = [];
+  for (let i = ti + 2; i < lines.length; i++) {
+    const l = lines[i].trim();
+    if (!l.startsWith('|')) break;
+    const cols = l.split('|').slice(1, -1).map(c => c.trim());
+    if (cols.length >= 4 && cols[0] && !cols[0].startsWith('-'))
+      rows.push({ person: cols[0], agent: cols[1], status: cols[2], on: cols[3], updated: cols[4] || '—' });
+  }
+  return rows;
+}
+
+function parseSection(md, heading) {
+  const esc = heading.replace(/[/\\^$*+?.()|[\]{}]/g, '\\$&');
+  const m = md.match(new RegExp('## ' + esc + '\\n([\\s\\S]*?)(?=\\n## |$)'));
+  if (!m) return [];
+  return m[1].split('\n')
+    .map(l => l.trim()).filter(l => l && !l.startsWith('_'))
+    .map(l => l.replace(/^\*\*/, '').replace(/^[-*]\s*/, ''));
+}
+
+function statusColor(s) {
+  if (s.includes('🟢')) return '#3fb950';
+  if (s.includes('🟡')) return '#d29922';
+  if (s.includes('🔴')) return '#f85149';
+  return '#8b949e';
+}
+
+function ago(d) {
+  const m = Math.floor((Date.now() - new Date(d)) / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return m + 'm ago';
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + 'h ago';
+  return Math.floor(h / 24) + 'd ago';
+}
+
+function whoClass(name) {
+  if (!name) return '';
+  const n = name.toLowerCase();
+  if (n.includes('nir') || n.includes('nirmoran')) return 'nir';
+  if (n.includes('orel')) return 'orel';
+  return '';
+}
+
+// ── Render ───────────────────────────────────────────────────────
+function renderStatus(rows) {
+  const grid = document.getElementById('status-grid');
+  grid.innerHTML = '';
+  ['nir', 'orel'].forEach(key => {
+    const row = rows.find(r => r.person.toLowerCase() === key) || {
+      person: key === 'nir' ? 'Nir' : 'Orel',
+      agent: key === 'nir' ? 'Claude' : 'Codex',
+      status: '⚪ Unknown', on: '—', updated: '—'
+    };
+    const card = document.createElement('div');
+    card.className = 'person-card ' + key;
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="person-name">${row.person}</div>
+        <div class="agent-tag">${row.agent}</div>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Status</span>
+        <span class="meta-val" style="color:${statusColor(row.status)}">${row.status}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Updated</span>
+        <span class="meta-val" style="color:var(--muted);font-size:12px">${row.updated}</span>
+      </div>
+      <div class="working-box">
+        <div class="label">Working on</div>
+        <div class="val">${row.on === '—' ? 'Nothing right now' : row.on}</div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function renderCommits(commits) {
+  const el = document.getElementById('commits');
+  if (!commits.length) { el.innerHTML = '<div class="empty">No commits yet</div>'; return; }
+  el.innerHTML = commits.map(c => {
+    const author = c.commit.author.name || '';
+    const cls = whoClass(author);
+    const msg = c.commit.message.split('\n')[0].slice(0, 58);
+    return `<div class="commit">
+      <div class="c-dot ${cls}"></div>
+      <div>
+        <div class="c-msg">${msg}</div>
+        <div class="c-meta">${author || 'unknown'} · ${ago(c.commit.author.date)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderNotes(notes) {
+  const el = document.getElementById('notes');
+  if (!notes.length) { el.innerHTML = '<div class="empty">No notes yet</div>'; return; }
+  el.innerHTML = notes.map(n => `<div class="note">${n}</div>`).join('');
+}
+
+// ── Load ─────────────────────────────────────────────────────────
+async function loadAll() {
+  resetCd();
+  document.getElementById('err').style.display = 'none';
+  try {
+    const [md, commits] = await Promise.all([getWorkspace(), getCommits()]);
+    renderStatus(parseTable(md));
+    renderCommits(commits);
+    renderNotes(parseSection(md, '📝 Notes / Decisions'));
+    document.getElementById('synced').textContent = 'Synced ' + new Date().toLocaleTimeString();
+  } catch (e) {
+    const el = document.getElementById('err');
+    el.textContent = '⚠ ' + e.message;
+    el.style.display = 'block';
+  }
+}
+
+// ── Countdown ────────────────────────────────────────────────────
+function resetCd() {
+  clearInterval(cdTimer);
+  cdVal = 60;
+  document.getElementById('cd').textContent = cdVal;
+  cdTimer = setInterval(() => {
+    cdVal--;
+    document.getElementById('cd').textContent = cdVal;
+    if (cdVal <= 0) loadAll();
+  }, 1000);
+}
+
+loadAll();
+</script>
+</body>
+</html>
