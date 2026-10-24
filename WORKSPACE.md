@@ -10,7 +10,7 @@
 | Person | Agent  | Status     | Working On              | Last Updated |
 |--------|--------|------------|-------------------------|--------------|
 | Nir    | Claude | 🟡 Setting up | Repo init + structure | 2026-05-06   |
-| Orel   | Codex  | ⚪ Not started | —                    | —            |
+| Orel   | Claude | ⚪ Not started | —                    | —            |
 
 ---
 
